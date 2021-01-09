@@ -1,0 +1,188 @@
+﻿using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AshBot
+{
+	public class CommandHandler
+	{
+		public readonly DiscordSocketClient _client;
+		public readonly CommandService _commands;
+
+		public CommandHandler(DiscordSocketClient client, CommandService commands)
+		{
+			_commands = commands;
+			_client = client;
+		}
+
+		public async Task InstallCommandsAsync()
+		{
+			// Hook the MessageReceived event into our command handler
+			_client.MessageReceived += HandleCommandAsync;
+
+			_client.MessageReceived += SemarcGutReagierer;
+
+			_client.MessageDeleted += _client_MessageDeleted;
+
+			//_client.MessageReceived += RumSpammer;
+
+
+
+
+			// Here we discover all of the command modules in the entry 
+			// assembly and load them. Starting from Discord.NET 2.0, a
+			// service provider is required to be passed into the
+			// module registration method to inject the 
+			// required dependencies.
+			//
+			// If you do not use Dependency Injection, pass null.
+			// See Dependency Injection guide for more information.
+
+			await _commands.AddModuleAsync<BasicModule>(null);
+			await _commands.AddModuleAsync<BotServerManagmentModule>(null);
+
+			//await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
+			//                                services: null);
+		}
+
+		private Task _client_MessageDeleted(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
+		{
+
+			return Task.Delay(0);
+
+		}
+
+		private async Task SemarcGutReagierer(SocketMessage messageParam)
+		{
+			// Don't process the command if it was a system message
+			if (!(messageParam is SocketUserMessage message))
+				return;
+
+			string messagestring = message.Content.ToLower();
+
+			List<IEmote> ReactionEmotes = new List<IEmote>();
+
+			if (messagestring.Contains("semarc") ||
+				messagestring.Contains("darrin") ||
+				messagestring.Contains("dorrin") ||
+				messagestring.Contains(GlobalVariables.CreatePing(GlobalConstants.ValidModIds[0])) ||
+				messagestring.Contains(GlobalVariables.CreatePing(GlobalConstants.ValidModIds[1])))
+			{
+				ReactionEmotes.Add(new Emoji("🇬"));
+				ReactionEmotes.Add(new Emoji("🇺"));
+				ReactionEmotes.Add(new Emoji("🇹"));
+
+				foreach (IEmote emotee in ReactionEmotes)
+				{
+					await messageParam.AddReactionAsync(emotee);
+
+				}
+
+			}
+
+			if (messagestring.Contains("luki") ||
+				messagestring.Contains("exagonee") ||
+				messagestring.Contains(GlobalVariables.CreatePing(GlobalConstants.ExegonneId)))
+			{
+				if (Emote.TryParse(GlobalConstants.RegionalIndicatorC, out var GrossC) && Emote.TryParse(GlobalConstants.RegionalIndicatorH, out var GrossH))
+				{
+					ReactionEmotes.Add(new Emoji("🇸"));
+					ReactionEmotes.Add(new Emoji("🇨"));
+					ReactionEmotes.Add(new Emoji("🇭"));
+					ReactionEmotes.Add(new Emoji("🇱"));
+					ReactionEmotes.Add(new Emoji("🇪"));
+					ReactionEmotes.Add(GrossC);
+					ReactionEmotes.Add(GrossH);
+					ReactionEmotes.Add(new Emoji("🇹"));
+
+
+					foreach (IEmote emotee in ReactionEmotes)
+					{
+						await messageParam.AddReactionAsync(emotee);
+
+					}
+
+				}
+			}
+			if (messagestring.Contains("bellugah") ||
+				messagestring.Contains(GlobalVariables.CreatePing(GlobalConstants.BellugahId)))
+			{
+				ReactionEmotes.Add(new Emoji("🇯"));
+				ReactionEmotes.Add(new Emoji("🇦"));
+
+
+				foreach (IEmote emotee in ReactionEmotes)
+				{
+					await messageParam.AddReactionAsync(emotee);
+
+				}
+			}
+
+		}
+
+
+		//private async Task RumSpammer(SocketMessage messageParam)
+		//{
+		//	// Don't process the command if it was a system message
+		//	if (!(messageParam is SocketUserMessage message))
+		//		return;
+
+		//	var context = new SocketCommandContext(_client, message);
+
+		//	if (message.Author.IsBot)
+		//	{
+		//		if (message.Content == "Spamnachricht A")
+		//		{
+		//			await context.Channel.SendMessageAsync("Spamnachricht B");
+		//		}
+		//		else if (message.Content == "Spamnachricht B")
+		//		{
+		//			await context.Channel.SendMessageAsync("Spamnachricht A");
+		//		}
+		//	}
+		//}
+
+		private async Task HandleCommandAsync(SocketMessage messageParam)
+		{
+			// Don't process the command if it was a system message
+			if (!(messageParam is SocketUserMessage message))
+				return;
+
+			// Create a number to track where the prefix ends and the command begins
+			int argPos = 0;
+
+			// Determine if the message is a command based on the prefix and make sure no bots trigger commands
+			if (!(message.HasCharPrefix(GlobalVariables.CommandPrefix, ref argPos) ||
+				message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
+				message.Author.IsBot)
+				return;
+
+			// Create a WebSocket-based command context based on the message
+			var context = new SocketCommandContext(_client, message);
+
+			// Execute the command with the command context we just
+			// created, along with the service provider for precondition checks.
+
+			// Keep in mind that result does not indicate a return value
+			// rather an object stating if the command executed successfully.
+			IResult result = await _commands.ExecuteAsync(
+				context: context,
+				argPos: argPos,
+				services: null);
+
+			// Optionally, we may inform the user if the command fails
+			// to be executed; however, this may not always be desired,
+			// as it may clog up the request queue should a user spam a
+			// command.
+			if (!result.IsSuccess)
+				await context.Channel.SendMessageAsync(result.ErrorReason);
+		}
+
+	}
+}

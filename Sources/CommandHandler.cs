@@ -3,9 +3,12 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AshBot
@@ -25,8 +28,6 @@ namespace AshBot
 		{
 			// Hook the MessageReceived event into our command handler
 			_client.MessageReceived += HandleCommandAsync;
-
-			_client.MessageReceived += SemarcGutReagierer;
 
 			_client.MessageDeleted += _client_MessageDeleted;
 
@@ -51,14 +52,17 @@ namespace AshBot
 			//                                services: null);
 		}
 
-		private Task _client_MessageDeleted(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
+		private async Task _client_MessageDeleted(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
 		{
+			IMessage message = await arg1.GetOrDownloadAsync();
 
-			return Task.Delay(0);
-
+			if (message is null == false)
+			{
+				Console.WriteLine($"Message by {message.Author} Deleted in {message.Channel.Name} (Id: {message.Channel.Id}) Messagetext: {message.Content}");
+			}
 		}
 
-		private async Task SemarcGutReagierer(SocketMessage messageParam)
+		private async Task HandleCommandAsync(SocketMessage messageParam)
 		{
 			// Don't process the command if it was a system message
 			if (!(messageParam is SocketUserMessage message))
@@ -68,91 +72,34 @@ namespace AshBot
 
 			List<IEmote> ReactionEmotes = new List<IEmote>();
 
-			if (messagestring.Contains("semarc") ||
-				messagestring.Contains("darrin") ||
-				messagestring.Contains("dorrin") ||
-				messagestring.Contains(GlobalVariables.CreatePing(GlobalConstants.ValidModIds[0])) ||
-				messagestring.Contains(GlobalVariables.CreatePing(GlobalConstants.ValidModIds[1])))
+			if (message.Author.IsBot == false)
 			{
-				ReactionEmotes.Add(new Emoji("🇬"));
-				ReactionEmotes.Add(new Emoji("🇺"));
-				ReactionEmotes.Add(new Emoji("🇹"));
-
-				foreach (IEmote emotee in ReactionEmotes)
+				if (messagestring.Contains("senat"))
 				{
-					await messageParam.AddReactionAsync(emotee);
-
+					await messageParam.Channel.SendMessageAsync("https://tenor.com/view/senate-palpatine-star-wars-gif-5129779");
 				}
-
-			}
-
-			if (messagestring.Contains("luki") ||
-				messagestring.Contains("exagonee") ||
-				messagestring.Contains(GlobalVariables.CreatePing(GlobalConstants.ExegonneId)))
-			{
-				if (Emote.TryParse(GlobalConstants.RegionalIndicatorC, out var GrossC) && Emote.TryParse(GlobalConstants.RegionalIndicatorH, out var GrossH))
+				if (messagestring.Trim() == "hello there")
 				{
-					ReactionEmotes.Add(new Emoji("🇸"));
-					ReactionEmotes.Add(new Emoji("🇨"));
-					ReactionEmotes.Add(new Emoji("🇭"));
-					ReactionEmotes.Add(new Emoji("🇱"));
-					ReactionEmotes.Add(new Emoji("🇪"));
-					ReactionEmotes.Add(GrossC);
-					ReactionEmotes.Add(GrossH);
-					ReactionEmotes.Add(new Emoji("🇹"));
-
-
-					foreach (IEmote emotee in ReactionEmotes)
-					{
-						await messageParam.AddReactionAsync(emotee);
-
-					}
-
+					await messageParam.Channel.SendMessageAsync("https://tenor.com/view/hello-there-general-kenobi-star-wars-grevious-gif-17774326");
 				}
-			}
-			if (messagestring.Contains("bellugah") ||
-				messagestring.Contains(GlobalVariables.CreatePing(GlobalConstants.BellugahId)))
-			{
-				ReactionEmotes.Add(new Emoji("🇯"));
-				ReactionEmotes.Add(new Emoji("🇦"));
-
-
-				foreach (IEmote emotee in ReactionEmotes)
+				if (messagestring.Contains("democracy"))
 				{
-					await messageParam.AddReactionAsync(emotee);
-
+					await messageParam.Channel.SendMessageAsync("https://tenor.com/view/star-wars-democracy-i-love-democracy-gif-13935227");
+				}
+				if (messagestring.Trim() == "execute order 66")
+				{
+					await messageParam.Channel.SendMessageAsync("It will be done my Lord");
+					//await messageParam.Channel.SendFileAsync(StreamFromBitmap(Properties.Resources.ExecuteOrder66), "ExecuteOrder66.gif");
+				}
+				if (messagestring.Trim() == "execute order 69")
+				{
+					await messageParam.Channel.SendMessageAsync("Luke, did I ever tell you about Ahsoka Tano? She was your father’s exotic teenage alien apprentice, a fine piece of jailbait from a more civilized age. She had the tightest body and the perkiest little breasts in the galaxy; barely legal in most systems. Anakin and I used to doubleteam her at the end of every successful campaign during the Clone Wars, and once in a while we’d even have the entire 501st run a train over her, part of official Jedi “training” of course. In time, she learned how to handle a meatsaber better than anyone in the Jedi Temple. She wore a miniskirt every day so we told her there were no panties in space, and since she was constantly doing acrobatics you’d get a glimpse of her orange pussy mid fight as she’d do a flip while slicing a B2 Super Battledroid in half. It was surreal. We taught her to grip her weapon backwards like a dildo and she constantly got captured by pirates and slavers almost every other day. It was ridiculous, like a constant porno Luke, you have no idea. And she was a good friend. And then there was that time somebody drilled a glory hole into the Temple's 3rd level bathrooms. We never did figure out who put it there but we sure made great use of it. Handjobs, blowjobs, anal, hell, I might have even fucked some orfices human's don't even have. The bathroom was unisex, so I'm fairly certain some dudes slipped it in, but I didn't really care. All I did was picture Satine and-- oh, I haven't told you about Satine have I, Luke? She was the duchess of Mandalore, though she was a more of a 'Mandawhore', if you get my drift...");
 				}
 			}
 
-		}
 
 
-		//private async Task RumSpammer(SocketMessage messageParam)
-		//{
-		//	// Don't process the command if it was a system message
-		//	if (!(messageParam is SocketUserMessage message))
-		//		return;
 
-		//	var context = new SocketCommandContext(_client, message);
-
-		//	if (message.Author.IsBot)
-		//	{
-		//		if (message.Content == "Spamnachricht A")
-		//		{
-		//			await context.Channel.SendMessageAsync("Spamnachricht B");
-		//		}
-		//		else if (message.Content == "Spamnachricht B")
-		//		{
-		//			await context.Channel.SendMessageAsync("Spamnachricht A");
-		//		}
-		//	}
-		//}
-
-		private async Task HandleCommandAsync(SocketMessage messageParam)
-		{
-			// Don't process the command if it was a system message
-			if (!(messageParam is SocketUserMessage message))
-				return;
 
 			// Create a number to track where the prefix ends and the command begins
 			int argPos = 0;

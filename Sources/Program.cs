@@ -20,9 +20,25 @@ namespace AshBot
 		public static async Task MainAsync()
 		{
 
-			client = new DiscordSocketClient();
+			DiscordSocketConfig Clientconfig = new DiscordSocketConfig()
+			{
+				ExclusiveBulkDelete = false,
+				LogLevel = LogSeverity.Verbose,
+				MessageCacheSize = 100
+			};
 
-			CommandService commandservicer = new CommandService();
+			CommandServiceConfig CommandConfig = new CommandServiceConfig()
+			{
+				CaseSensitiveCommands = false,
+				LogLevel = LogSeverity.Verbose,
+				ThrowOnError = false,
+				DefaultRunMode = RunMode.Async,
+				IgnoreExtraArgs = true
+			};
+
+			client = new DiscordSocketClient(Clientconfig);
+
+			CommandService commandservicer = new CommandService(CommandConfig);
 
 			commandHandler = new CommandHandler(client, commandservicer);
 
@@ -30,17 +46,14 @@ namespace AshBot
 
 			await commandHandler.InstallCommandsAsync();
 
-			client.Log += Log;
-			client.MessageReceived += MessageReceived;
-
 			// Remember to keep token private or to read it from an 
 			// external source! In this case, we are reading the token 
 			// from an environment variable. If you do not know how to set-up
 			// environment variables, you may find more information on the 
 			// Internet or by using other methods such as reading from 
 			// a configuration.
-			await client.LoginAsync(TokenType.Bot,
-				Environment.GetEnvironmentVariable("DiscordToken", EnvironmentVariableTarget.User));
+
+			await client.LoginAsync(TokenType.Bot, GlobalConstants.BotToken);
 			await client.StartAsync();
 
 
@@ -48,20 +61,6 @@ namespace AshBot
 			await Task.Delay(-1);
 		}
 
-		private static Task Log(LogMessage msg)
-		{
-			Console.WriteLine(msg.ToString());
-			return Task.CompletedTask;
-		}
 
-		private static async Task MessageReceived(SocketMessage message)
-		{
-			if (message.Content == "!ping")
-			{
-				await message.Channel.SendMessageAsync("Pong!");
-			}
-
-
-		}
 	}
 }

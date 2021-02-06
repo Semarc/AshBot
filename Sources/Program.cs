@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -19,6 +20,8 @@ namespace AshBot
 
 		public static async Task MainAsync()
 		{
+			Properties.AshSettings temp = Properties.AshSettings.Default;
+
 
 			DiscordSocketConfig Clientconfig = new DiscordSocketConfig()
 			{
@@ -55,6 +58,7 @@ namespace AshBot
 
 			await client.LoginAsync(TokenType.Bot, GlobalConstants.BotToken);
 			await client.StartAsync();
+
 
 
 			// Block this task until the program is closed.

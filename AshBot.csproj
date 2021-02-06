@@ -20,12 +20,29 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Discord.Net" Version="2.2.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.5.0" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
 		<PackageReference Include="System.Resources.Extensions" Version="5.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Public Repos\Discord.Net\src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" />
+	  <ProjectReference Include="..\..\..\Public Repos\Discord.Net\src\Discord.Net.Commands\Discord.Net.Commands.csproj" />
+	  <ProjectReference Include="..\..\..\Public Repos\Discord.Net\src\Discord.Net.Core\Discord.Net.Core.csproj" />
+	  <ProjectReference Include="..\..\..\Public Repos\Discord.Net\src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" />
+	  <ProjectReference Include="..\..\..\Public Repos\Discord.Net\src\Discord.Net.Rest\Discord.Net.Rest.csproj" />
+	  <ProjectReference Include="..\..\..\Public Repos\Discord.Net\src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" />
+	  <ProjectReference Include="..\..\..\Public Repos\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
+	  <ProjectReference Include="..\..\..\Public Repos\Discord.Net\test\Discord.Net.Tests.Integration\Discord.Net.Tests.Integration.csproj" />
+	  <ProjectReference Include="..\..\..\Public Repos\Discord.Net\test\Discord.Net.Tests.Unit\Discord.Net.Tests.Unit.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\AshSettings.Designer.cs">
+	    <DesignTimeSharedInput>True</DesignTimeSharedInput>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>AshSettings.settings</DependentUpon>
+	  </Compile>
 	  <Compile Update="Properties\Resources.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
@@ -38,5 +55,12 @@
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Properties\AshSettings.settings">
+	    <Generator>SettingsSingleFileGenerator</Generator>
+	    <LastGenOutput>AshSettings.Designer.cs</LastGenOutput>
+	  </None>
 	</ItemGroup>
 </Project>

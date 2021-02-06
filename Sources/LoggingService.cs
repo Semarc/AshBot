@@ -23,7 +23,7 @@ public class LoggingService
 		if (commandInfosOpt.IsSpecified)
 		{
 			CommandInfo ComInfo = commandInfosOpt.Value;
-			Console.WriteLine($"[Command/{ComInfo.Module.Name}] {ComInfo.Name} executed: Info: {Infos} {Error}");
+			Console.WriteLine($"[Command/{ComInfo.Module.Name}] {DateTime.Now.ToLongTimeString()} {ComInfo.Name} executed: Info: {Infos} {Error}");
 		}
 		else
 		{

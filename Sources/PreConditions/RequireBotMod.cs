@@ -16,7 +16,7 @@ namespace AshBot
 			}
 			else
 			{
-				return Task.FromResult(PreconditionResult.FromError("Du hast nicht die Berechtigungen, um diesen Befehl auszuführen <:glatt:707922147334553620>"));
+				return Task.FromResult(PreconditionResult.FromError($"Du hast nicht die Berechtigungen, um diesen Befehl auszuführen {GlobalConstants.Glatt}"));
 			}
 		}
 	}
